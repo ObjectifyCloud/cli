@@ -5,7 +5,7 @@ CLI for the [Objectify](https://objectify.cloud) Objects Platform API.
 ## Installation
 
 ```bash
-npm install -g @objectify/cli
+npm install -g github:ObjectifyCloud/cli
 ```
 
 ## Quick Start
