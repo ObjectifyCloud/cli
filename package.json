@@ -4,7 +4,15 @@
   "description": "CLI for the Objectify multi-tenant Objects Platform API",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ObjectifyCloud/cli.git"
+  },
+  "homepage": "https://objectify.cloud/documentation#sdks",
+  "keywords": ["objectify", "cli", "api", "multi-tenant", "baas", "cloudflare"],
+  "engines": { "node": ">=18.0.0" },
   "bin": { "objectify": "./dist/index.js" },
+  "files": ["dist", "LICENSE", "README.md"],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts"
