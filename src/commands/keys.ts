@@ -19,10 +19,10 @@ keysCmd
   .action(async (opts) => {
     const spinner = ora('Loading...').start();
     try {
-      const { data } = await get<{ data: Record<string, unknown>[] }>(`/admin/tenants/${tid(opts)}/keys`);
+      const { data } = await get<Record<string, unknown>[]>(`/admin/tenants/${tid(opts)}/keys`);
       spinner.stop();
       if (opts.json) { printJson(data); return; }
-      printTable((data as any).data || [], ['key_id', 'label', 'scopes', 'status', 'created_at']);
+      printTable(Array.isArray(data) ? data : [], ['key_id', 'label', 'scopes', 'status', 'created_at']);
     } catch (e) { spinner.stop(); printError(String(e)); }
   });
 

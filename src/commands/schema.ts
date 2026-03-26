@@ -12,7 +12,7 @@ schemaCmd
   .action(async (opts) => {
     const spinner = ora('Loading types...').start();
     try {
-      const { data } = await get<{ data: Record<string, unknown>[] }>('/schema/types');
+      const { data } = await get<{ data: Record<string, unknown>[] }>('/v1/object-types');
       spinner.stop();
       if (opts.json) { printJson(data); return; }
       printTable(data.data || data as unknown as Record<string, unknown>[], ['object_type_id', 'name', 'created_at']);
@@ -25,7 +25,7 @@ schemaCmd
   .option('--json', 'JSON output')
   .action(async (typeId, opts) => {
     try {
-      const { data } = await get(`/schema/types/${typeId}`);
+      const { data } = await get(`/v1/object-types/${typeId}`);
       if (opts.json) { printJson(data); return; }
       console.log(data);
     } catch (e) { printError(String(e)); }
@@ -38,7 +38,7 @@ schemaCmd
   .action(async (opts) => {
     const spinner = ora('Creating...').start();
     try {
-      const { data } = await post('/schema/types', { name: opts.name });
+      const { data } = await post('/v1/object-types', { name: opts.name });
       spinner.stop();
       printSuccess(`Created type: ${(data as Record<string, string>).object_type_id}`);
     } catch (e) { spinner.stop(); printError(String(e)); }
@@ -49,7 +49,7 @@ schemaCmd
   .description('Export all types as JSON')
   .action(async () => {
     try {
-      const { data } = await get('/schema/types');
+      const { data } = await get('/v1/object-types');
       printJson(data);
     } catch (e) { printError(String(e)); }
   });

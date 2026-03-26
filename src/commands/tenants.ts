@@ -12,10 +12,10 @@ tenantsCmd
   .action(async (opts) => {
     const spinner = ora('Loading...').start();
     try {
-      const { data } = await get<{ data: Record<string, unknown>[] }>('/admin/tenants');
+      const { data } = await get<Record<string, unknown>[]>('/admin/tenants');
       spinner.stop();
       if (opts.json) { printJson(data); return; }
-      printTable((data as any).data || [data], ['tenant_id', 'organization_name', 'plan_tier', 'created_at']);
+      printTable(Array.isArray(data) ? data : [data], ['tenant_id', 'organization_name', 'plan_tier', 'created_at']);
     } catch (e) { spinner.stop(); printError(String(e)); }
   });
 

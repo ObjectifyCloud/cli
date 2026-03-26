@@ -14,10 +14,10 @@ objectsCmd
   .action(async (typeId, opts) => {
     const spinner = ora('Loading...').start();
     try {
-      const { data } = await get<{ data: Record<string, unknown>[] }>(`/objects/${typeId}`, { limit: opts.limit, cursor: opts.cursor });
+      const { data } = await get<Record<string, unknown>[]>(`/v1/objects/${typeId}/list`, { limit: opts.limit, cursor: opts.cursor });
       spinner.stop();
       if (opts.json) { printJson(data); return; }
-      const items = (data as any).data || data;
+      const items = data;
       if (Array.isArray(items)) printTable(items, ['object_id', 'created_at', 'updated_at']);
       else printJson(data);
     } catch (e) { spinner.stop(); printError(String(e)); }
@@ -29,7 +29,7 @@ objectsCmd
   .option('--json', 'JSON output')
   .action(async (typeId, objectId, opts) => {
     try {
-      const { data } = await get(`/objects/${typeId}/${objectId}`);
+      const { data } = await get(`/v1/objects/${typeId}/${objectId}`);
       printJson(data);
     } catch (e) { printError(String(e)); }
   });
@@ -42,7 +42,7 @@ objectsCmd
     const spinner = ora('Creating...').start();
     try {
       const properties = JSON.parse(opts.data);
-      const { data } = await post(`/objects/${typeId}`, { properties });
+      const { data } = await post(`/v1/objects/${typeId}`, { properties });
       spinner.stop();
       printSuccess(`Created: ${(data as Record<string, string>).object_id}`);
     } catch (e) { spinner.stop(); printError(String(e)); }
@@ -62,10 +62,10 @@ objectsCmd
         const [prop, val] = opts.filter.split('=');
         filters.push({ property: prop, operator: 'eq', value: val });
       }
-      const { data } = await post(`/objects/${typeId}/search`, { filters, limit: parseInt(opts.limit) });
+      const { data } = await post(`/v1/objects/${typeId}/search`, { filters, limit: parseInt(opts.limit) });
       spinner.stop();
       if (opts.json) { printJson(data); return; }
-      const items = (data as any).data || data;
+      const items = data;
       if (Array.isArray(items)) printTable(items, ['object_id', 'created_at']);
       else printJson(data);
     } catch (e) { spinner.stop(); printError(String(e)); }
@@ -76,7 +76,7 @@ objectsCmd
   .description('Delete an object')
   .action(async (typeId, objectId) => {
     try {
-      await del(`/objects/${typeId}/${objectId}`);
+      await del(`/v1/objects/${typeId}/${objectId}`);
       printSuccess('Deleted.');
     } catch (e) { printError(String(e)); }
   });
