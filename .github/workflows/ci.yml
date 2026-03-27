@@ -11,40 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: project
-
-      - uses: actions/checkout@v4
-        with:
-          repository: ObjectifyCloud/api
-          path: api
-          sparse-checkout: sdk
-          sparse-checkout-cone-mode: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: project/package-lock.json
-
-      - name: Build SDK
-        run: cd api/sdk && npm install && npm run build
 
       - run: npm ci
-        working-directory: project
 
       - name: Lint
         run: npm run lint
-        working-directory: project
 
       - name: Format check
         run: npm run format:check
-        working-directory: project
 
       - name: Typecheck
         run: npx tsc --noEmit
-        working-directory: project
 
       - name: Test
         run: npm test
-        working-directory: project
