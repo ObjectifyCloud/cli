@@ -9,27 +9,51 @@
     "url": "https://github.com/ObjectifyCloud/cli.git"
   },
   "homepage": "https://objectify.cloud/documentation#sdks",
-  "keywords": ["objectify", "cli", "api", "multi-tenant", "baas", "cloudflare"],
-  "engines": { "node": ">=18.0.0" },
-  "bin": { "objectify": "./dist/index.js" },
-  "files": ["dist", "LICENSE", "README.md"],
+  "keywords": [
+    "objectify",
+    "cli",
+    "api",
+    "multi-tenant",
+    "baas",
+    "cloudflare"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bin": {
+    "objectify": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@objectify/sdk": "file:../api/sdk",
-    "commander": "^12.0.0",
     "chalk": "^5.3.0",
-    "ora": "^8.0.0",
-    "conf": "^13.0.0"
+    "commander": "^12.0.0",
+    "conf": "^13.0.0",
+    "ora": "^8.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "tsx": "^4.0.0",
+    "@eslint/js": "^9.0.0",
     "@types/node": "^20.0.0",
-    "vitest": "^2.0.0"
+    "eslint": "^9.0.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.2.4"
   }
 }

@@ -54,12 +54,23 @@ export const loginCmd = new Command('login')
     let email = opts.email;
     if (!email) {
       const rl = readline.createInterface({ input: process.stdin, output: process.stderr });
-      email = await new Promise<string>((resolve) => rl.question('Email: ', (a) => { rl.close(); resolve(a.trim()); }));
+      email = await new Promise<string>((resolve) =>
+        rl.question('Email: ', (a) => {
+          rl.close();
+          resolve(a.trim());
+        }),
+      );
     }
-    if (!email) { printError('Email is required'); process.exit(1); }
+    if (!email) {
+      printError('Email is required');
+      process.exit(1);
+    }
 
     const password = await promptHidden('Password: ');
-    if (!password) { printError('Password is required'); process.exit(1); }
+    if (!password) {
+      printError('Password is required');
+      process.exit(1);
+    }
 
     const spinner = ora('Logging in...').start();
     try {
@@ -77,20 +88,19 @@ export const loginCmd = new Command('login')
     }
   });
 
-export const logoutCmd = new Command('logout')
-  .description('Clear stored credentials')
-  .action(() => {
-    const { clearToken } = require('../config.js');
-    clearToken();
-    printSuccess('Logged out.');
-  });
+export const logoutCmd = new Command('logout').description('Clear stored credentials').action(() => {
+  const { clearToken } = require('../config.js');
+  clearToken();
+  printSuccess('Logged out.');
+});
 
-export const whoamiCmd = new Command('whoami')
-  .description('Show current authentication info')
-  .action(async () => {
-    const { getAuthInfo } = await import('../config.js');
-    const info = getAuthInfo();
-    console.log(chalk.bold('Base URL:'), info.baseUrl);
-    console.log(chalk.bold('Auth:'), info.token ? `${info.tokenType} (${info.token.slice(0, 12)}...)` : chalk.gray('not authenticated'));
-    if (info.activeTenant) console.log(chalk.bold('Tenant:'), info.activeTenant);
-  });
+export const whoamiCmd = new Command('whoami').description('Show current authentication info').action(async () => {
+  const { getAuthInfo } = await import('../config.js');
+  const info = getAuthInfo();
+  console.log(chalk.bold('Base URL:'), info.baseUrl);
+  console.log(
+    chalk.bold('Auth:'),
+    info.token ? `${info.tokenType} (${info.token.slice(0, 12)}...)` : chalk.gray('not authenticated'),
+  );
+  if (info.activeTenant) console.log(chalk.bold('Tenant:'), info.activeTenant);
+});

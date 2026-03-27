@@ -28,12 +28,16 @@ export function resetClient(): void {
   _client = null;
 }
 
-export async function api<T = unknown>(method: string, path: string, options?: {
-  body?: unknown;
-  query?: Record<string, string | number | undefined>;
-  baseUrl?: string;
-  token?: string;
-}): Promise<ApiResponse<T>> {
+export async function api<T = unknown>(
+  method: string,
+  path: string,
+  options?: {
+    body?: unknown;
+    query?: Record<string, string | number | undefined>;
+    baseUrl?: string;
+    token?: string;
+  },
+): Promise<ApiResponse<T>> {
   const base = (options?.baseUrl || getBaseUrl()).replace(/\/$/, '');
   let url = `${base}${path}`;
 
@@ -58,7 +62,10 @@ export async function api<T = unknown>(method: string, path: string, options?: {
 
   if (!res.ok) {
     const envelope = json as Record<string, unknown> | null;
-    const err = (typeof envelope?.error === 'object' && envelope?.error !== null ? envelope.error : {}) as Record<string, string>;
+    const err = (typeof envelope?.error === 'object' && envelope?.error !== null ? envelope.error : {}) as Record<
+      string,
+      string
+    >;
     const code = err.code || 'HTTP_ERROR';
     const message = err.message || (envelope?.message as string) || `HTTP ${res.status}`;
     throw new ApiError(res.status, code, message);
@@ -69,7 +76,8 @@ export async function api<T = unknown>(method: string, path: string, options?: {
   return { ok: true, status: res.status, data };
 }
 
-export const get = <T = unknown>(path: string, query?: Record<string, string | number | undefined>) => api<T>('GET', path, { query });
+export const get = <T = unknown>(path: string, query?: Record<string, string | number | undefined>) =>
+  api<T>('GET', path, { query });
 export const post = <T = unknown>(path: string, body?: unknown) => api<T>('POST', path, { body });
 export const patch = <T = unknown>(path: string, body?: unknown) => api<T>('PATCH', path, { body });
 export const del = <T = unknown>(path: string) => api<T>('DELETE', path);

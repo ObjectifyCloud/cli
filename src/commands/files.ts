@@ -14,17 +14,25 @@ filesCmd
     try {
       const { data } = await post<Record<string, unknown>[]>('/v1/files/search', { folder: opts.folder });
       spinner.stop();
-      if (opts.json) { printJson(data); return; }
+      if (opts.json) {
+        printJson(data);
+        return;
+      }
       printTable(Array.isArray(data) ? data : [], ['file_id', 'filename', 'mime_type', 'size_bytes', 'folder']);
-    } catch (e) { spinner.stop(); printError(String(e)); }
+    } catch (e) {
+      spinner.stop();
+      printError(String(e));
+    }
   });
 
-filesCmd
-  .command('get <fileId>')
-  .action(async (fileId) => {
-    try { const { data } = await get(`/v1/files/${fileId}`); printJson(data); }
-    catch (e) { printError(String(e)); }
-  });
+filesCmd.command('get <fileId>').action(async (fileId) => {
+  try {
+    const { data } = await get(`/v1/files/${fileId}`);
+    printJson(data);
+  } catch (e) {
+    printError(String(e));
+  }
+});
 
 filesCmd
   .command('download <fileId>')
@@ -42,12 +50,17 @@ filesCmd
         fs.writeFileSync(opts.output, buffer);
         printSuccess(`Saved to ${opts.output}`);
       }
-    } catch (e) { spinner.stop(); printError(String(e)); }
+    } catch (e) {
+      spinner.stop();
+      printError(String(e));
+    }
   });
 
-filesCmd
-  .command('delete <fileId>')
-  .action(async (fileId) => {
-    try { await del(`/v1/files/${fileId}`); printSuccess('Deleted.'); }
-    catch (e) { printError(String(e)); }
-  });
+filesCmd.command('delete <fileId>').action(async (fileId) => {
+  try {
+    await del(`/v1/files/${fileId}`);
+    printSuccess('Deleted.');
+  } catch (e) {
+    printError(String(e));
+  }
+});

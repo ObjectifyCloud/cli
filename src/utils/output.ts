@@ -5,9 +5,12 @@ export function printJson(data: unknown): void {
 }
 
 export function printTable(rows: Record<string, unknown>[], columns?: string[]): void {
-  if (!rows.length) { console.log(chalk.gray('No results.')); return; }
+  if (!rows.length) {
+    console.log(chalk.gray('No results.'));
+    return;
+  }
   const cols = columns || Object.keys(rows[0]);
-  const widths = cols.map(c => Math.max(c.length, ...rows.map(r => String(r[c] ?? '').length)));
+  const widths = cols.map((c) => Math.max(c.length, ...rows.map((r) => String(r[c] ?? '').length)));
 
   const header = cols.map((c, i) => chalk.bold(c.padEnd(widths[i]))).join('  ');
   const sep = cols.map((_, i) => '─'.repeat(widths[i])).join('──');
