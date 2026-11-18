@@ -16,7 +16,8 @@ export default tseslint.config(
         varsIgnorePattern: '^_',
         caughtErrorsIgnorePattern: '^_',
       }],
-      '@typescript-eslint/no-require-imports': 'off',
+      // ESM package ("type": "module"): require() throws at runtime, as `logout` once did.
+      '@typescript-eslint/no-require-imports': 'error',
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'eqeqeq': ['error', 'always', { null: 'ignore' }],
