@@ -43,12 +43,13 @@ keysCmd
   .action(async (opts) => {
     const spinner = ora('Creating...').start();
     try {
-      const { data } = await post(`/admin/tenants/${tid(opts)}/keys`, {
+      const { data } = await post<{ key: { key_id: string }; token: string }>(`/admin/tenants/${tid(opts)}/keys`, {
         label: opts.name,
         scopes: opts.scopes.split(','),
       });
       spinner.stop();
-      printSuccess(`Key created: ${(data as Record<string, string>).raw_key}`);
+      printSuccess(`Key created: ${data.key.key_id}`);
+      console.log(`Token (shown once, store it now): ${data.token}`);
     } catch (e) {
       spinner.stop();
       printError(String(e));

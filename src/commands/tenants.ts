@@ -12,13 +12,13 @@ tenantsCmd
   .action(async (opts) => {
     const spinner = ora('Loading...').start();
     try {
-      const { data } = await get<Record<string, unknown>[]>('/admin/tenants');
+      const { data } = await get<{ tenants: Record<string, unknown>[] }>('/admin/tenants');
       spinner.stop();
       if (opts.json) {
         printJson(data);
         return;
       }
-      printTable(Array.isArray(data) ? data : [data], ['tenant_id', 'organization_name', 'plan_tier', 'created_at']);
+      printTable(data.tenants ?? [], ['tenant_id', 'organization_name', 'plan_tier', 'created_at']);
     } catch (e) {
       spinner.stop();
       printError(String(e));
@@ -27,14 +27,17 @@ tenantsCmd
 
 tenantsCmd
   .command('create')
-  .requiredOption('--name <name>', 'Tenant name')
-  .option('--slug <slug>', 'Slug')
+  // The API takes only tenant_id (plus optional plan_limits/allowed_origins); it has no name or slug.
+  .requiredOption('--tenant-id <id>', 'Tenant ID (letters, digits, hyphens, underscores)')
   .action(async (opts) => {
     const spinner = ora('Creating...').start();
     try {
-      const { data } = await post('/admin/tenants', { name: opts.name, slug: opts.slug });
+      const { data } = await post<{ route: { tenant_id: string }; api_key: string }>('/admin/tenants', {
+        tenant_id: opts.tenantId,
+      });
       spinner.stop();
-      printSuccess(`Created tenant: ${(data as Record<string, string>).tenant_id}`);
+      printSuccess(`Created tenant: ${data.route.tenant_id}`);
+      console.log(`API key (shown once, store it now): ${data.api_key}`);
     } catch (e) {
       spinner.stop();
       printError(String(e));

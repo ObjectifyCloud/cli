@@ -3,34 +3,36 @@ import chalk from 'chalk';
 import ora from 'ora';
 import * as readline from 'node:readline';
 import { api } from '../api.js';
-import { setToken, getBaseUrl } from '../config.js';
+import { setToken, getBaseUrl, clearToken } from '../config.js';
 import { printSuccess, printError } from '../utils/output.js';
 
-function promptHidden(question: string): Promise<string> {
+// Reads stdin directly (no readline, which echoes what it reads to a TTY). A paste or pipe delivers the
+// password and its newline in one chunk, so scan every character; stdin ending also finishes the prompt.
+export function promptHidden(question: string, stdin: NodeJS.ReadStream = process.stdin): Promise<string> {
   return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stderr });
     process.stderr.write(question);
-    const stdin = process.stdin;
     const wasRaw = stdin.isRaw;
     if (typeof stdin.setRawMode === 'function') stdin.setRawMode(true);
     let buf = '';
-    const onData = (ch: Buffer) => {
-      const c = ch.toString('utf8');
-      if (c === '\n' || c === '\r' || c === '\u0004') {
-        if (typeof stdin.setRawMode === 'function') stdin.setRawMode(wasRaw ?? false);
-        stdin.removeListener('data', onData);
-        rl.close();
-        process.stderr.write('\n');
-        resolve(buf);
-      } else if (c === '\u0003') {
-        process.exit(130);
-      } else if (c === '\u007f' || c === '\b') {
-        buf = buf.slice(0, -1);
-      } else {
-        buf += c;
+    const finish = () => {
+      if (typeof stdin.setRawMode === 'function') stdin.setRawMode(wasRaw ?? false);
+      stdin.removeListener('data', onData);
+      stdin.removeListener('end', finish);
+      stdin.pause();
+      process.stderr.write('\n');
+      resolve(buf);
+    };
+    const onData = (chunk: Buffer) => {
+      for (const c of chunk.toString('utf8')) {
+        if (c === '\n' || c === '\r' || c === '\u0004') return finish();
+        if (c === '\u0003') process.exit(130);
+        if (c === '\u007f' || c === '\b') buf = buf.slice(0, -1);
+        else buf += c;
       }
     };
     stdin.on('data', onData);
+    stdin.on('end', finish);
+    stdin.resume(); // the email prompt's rl.close() pauses stdin, and adding a 'data' listener does not undo that
   });
 }
 
@@ -89,7 +91,6 @@ export const loginCmd = new Command('login')
   });
 
 export const logoutCmd = new Command('logout').description('Clear stored credentials').action(() => {
-  const { clearToken } = require('../config.js');
   clearToken();
   printSuccess('Logged out.');
 });

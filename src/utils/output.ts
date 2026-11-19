@@ -25,6 +25,8 @@ export function printSuccess(msg: string): void {
   console.log(chalk.green('✓'), msg);
 }
 
+// Every command's catch routes through here, so this is what makes failures exit non-zero.
 export function printError(msg: string): void {
   console.error(chalk.red('✗'), msg);
+  process.exitCode = 1;
 }

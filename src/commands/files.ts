@@ -12,13 +12,15 @@ filesCmd
   .action(async (opts) => {
     const spinner = ora('Loading...').start();
     try {
-      const { data } = await post<Record<string, unknown>[]>('/v1/files/search', { folder: opts.folder });
+      const { data } = await post<{ results: Record<string, unknown>[] }>('/v1/files/search', {
+        folder: opts.folder,
+      });
       spinner.stop();
       if (opts.json) {
         printJson(data);
         return;
       }
-      printTable(Array.isArray(data) ? data : [], ['file_id', 'filename', 'mime_type', 'size_bytes', 'folder']);
+      printTable(data.results ?? [], ['file_id', 'filename', 'mime_type', 'size_bytes', 'folder']);
     } catch (e) {
       spinner.stop();
       printError(String(e));

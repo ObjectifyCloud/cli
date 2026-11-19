@@ -14,7 +14,7 @@ objectsCmd
   .action(async (typeId, opts) => {
     const spinner = ora('Loading...').start();
     try {
-      const { data } = await get<Record<string, unknown>[]>(`/v1/objects/${typeId}/list`, {
+      const { data } = await get<{ results: Record<string, unknown>[] }>(`/v1/objects/${typeId}/list`, {
         limit: opts.limit,
         cursor: opts.cursor,
       });
@@ -23,9 +23,7 @@ objectsCmd
         printJson(data);
         return;
       }
-      const items = data;
-      if (Array.isArray(items)) printTable(items, ['object_id', 'created_at', 'updated_at']);
-      else printJson(data);
+      printTable(data.results ?? [], ['object_id', 'created_at', 'updated_at']);
     } catch (e) {
       spinner.stop();
       printError(String(e));
@@ -73,18 +71,19 @@ objectsCmd
     try {
       const filters: unknown[] = [];
       if (opts.filter) {
-        const [prop, val] = opts.filter.split('=');
-        filters.push({ property: prop, operator: 'eq', value: val });
+        const [prop, ...rest] = opts.filter.split('=');
+        filters.push({ property_id: prop, operator: 'eq', value: rest.join('=') });
       }
-      const { data } = await post(`/v1/objects/${typeId}/search`, { filters, limit: parseInt(opts.limit) });
+      const { data } = await post<{ results: Record<string, unknown>[] }>(`/v1/objects/${typeId}/search`, {
+        filters,
+        limit: parseInt(opts.limit),
+      });
       spinner.stop();
       if (opts.json) {
         printJson(data);
         return;
       }
-      const items = data;
-      if (Array.isArray(items)) printTable(items, ['object_id', 'created_at']);
-      else printJson(data);
+      printTable(data.results ?? [], ['object_id', 'created_at']);
     } catch (e) {
       spinner.stop();
       printError(String(e));
